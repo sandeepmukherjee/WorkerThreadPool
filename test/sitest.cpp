@@ -121,7 +121,6 @@ try {
 		buf << "Adding TestItem " << wi << " to queue";
 		log(buf);
 		wtp->addWorkItem(wi, sq);
-		wtp->addWorkItem(wi, sq);
 	}
 	log("All WI added. Waiting for empty..");
 

@@ -1,7 +1,7 @@
 
 # Copyright SM.
 
-CFLAGS = -g -Wall -Wextra
+CFLAGS = -g -Wall -Wextra -Werror
 OBJS = WorkerThreadPool.o Freelist.o WorkItem.o SharedObject.o WTPExceptions.o
 
 all : WTP.a tests

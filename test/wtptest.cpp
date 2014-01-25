@@ -75,7 +75,6 @@ try {
 
 	ti = dynamic_cast<TestItem *>(freelist.getItem());
 	wtp->addWorkItem(ti, sq);
-	wtp->addWorkItem(ti, sq);
 	for (i=0; i< 20; i++) {
 		WorkItem *wi = freelist.getItem();
 		if (wi == NULL)

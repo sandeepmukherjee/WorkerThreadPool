@@ -1,0 +1,5 @@
+
+*.o
+serialtest
+wtptest
+sitest
