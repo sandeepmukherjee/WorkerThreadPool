@@ -20,33 +20,33 @@ namespace WTP {
 class Freelist : public SharedObject
 {
 public:
-	/** Default constructor */
-	Freelist() {}
-	/**
-	 * Adds a WorkItem to the freelist.
-	 * This calls the WorkItem.reset() method.
-	 * @param[in] wi Derived instance of WorkItem to be added to freelist.
-	 */
-	void addItem(WorkItem *wi);
-	/**
-	 * Fetches a WorkItem from the freelist.
-	 * Note, do not make any assumptions on ordering - items can be returned
-	 * in a different order than added.
-	 * @return The WorkItem or NULL if the list is empty.
-	 */
-	WorkItem * getItem();
-	/**
-	 * Virtual destructor. This will free up all WorkItems in the list.
-	 */
-	virtual ~Freelist() { drain(); }
+    /** Default constructor */
+    Freelist() {}
+    /**
+     * Adds a WorkItem to the freelist.
+     * This calls the WorkItem.reset() method.
+     * @param[in] wi Derived instance of WorkItem to be added to freelist.
+     */
+    void addItem(WorkItem *wi);
+    /**
+     * Fetches a WorkItem from the freelist.
+     * Note, do not make any assumptions on ordering - items can be returned
+     * in a different order than added.
+     * @return The WorkItem or NULL if the list is empty.
+     */
+    WorkItem * getItem();
+    /**
+     * Virtual destructor. This will free up all WorkItems in the list.
+     */
+    virtual ~Freelist() { drain(); }
 
 private:
-	std::list<WorkItem *> _wilist; // The actual list
-	Freelist& operator=(Freelist& rhs); // Disallow assignment
-	Freelist(Freelist& rhs); // Disallow copying
+    std::list<WorkItem *> _wilist; // The actual list
+    Freelist& operator=(Freelist& rhs); // Disallow assignment
+    Freelist(Freelist& rhs); // Disallow copying
 
-	/** Free up all WorkItem instances in the list */
-	void drain();
+    /** Free up all WorkItem instances in the list */
+    void drain();
 };
 
 }

@@ -15,21 +15,21 @@ namespace WTP {
  */
 class SharedObject {
 public:
-	/** Default constructor */
-	SharedObject();
-	
-	/** Lock all data structures */
-	void lock();
+    /** Default constructor */
+    SharedObject();
+    
+    /** Lock all data structures */
+    void lock();
 
-	/** Unlock all data structures */
-	void unlock();
+    /** Unlock all data structures */
+    void unlock();
 
-	virtual ~SharedObject() {}
+    virtual ~SharedObject() {}
 
 private:
-	pthread_mutex_t _mutex; /**< The mutex that locks everything in this obj */
-	SharedObject operator=(SharedObject& rhs);
-	SharedObject(SharedObject& rhs);
+    pthread_mutex_t _mutex; /**< The mutex that locks everything in this obj */
+    SharedObject operator=(SharedObject& rhs);
+    SharedObject(SharedObject& rhs);
 
 };
 

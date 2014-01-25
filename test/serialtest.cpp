@@ -14,47 +14,47 @@ uint64_t starttime;
 
 class TestItem : public WorkItem {
 public:
-	TestItem(int serial) : _serial(serial) {}
+    TestItem(int serial) : _serial(serial) {}
  void run() {
-		uint64_t delta = time(NULL) - starttime;
-		int tm = int((double(rand())/RAND_MAX) * 5) + 1;
-		cout << delta << ": starting serial=" << _serial << ", sleeptime=" << tm << endl;
-		sleep(tm);
-		delta = time(NULL) - starttime;
-		cout << delta << ": done. serial=" << _serial << endl;
-	}
-	void reset() {
-		_serial = -1;	
-	}
+        uint64_t delta = time(NULL) - starttime;
+        int tm = int((double(rand())/RAND_MAX) * 5) + 1;
+        cout << delta << ": starting serial=" << _serial << ", sleeptime=" << tm << endl;
+        sleep(tm);
+        delta = time(NULL) - starttime;
+        cout << delta << ": done. serial=" << _serial << endl;
+    }
+    void reset() {
+        _serial = -1;    
+    }
 private:
-	int _serial;
+    int _serial;
 };
 
 int main()
 {
 try {
-	int i;
-	starttime = time(NULL);
-	wtp = new WorkerThreadPool();
-	unsigned int sq = wtp->addQueue();
+    int i;
+    starttime = time(NULL);
+    wtp = new WorkerThreadPool();
+    unsigned int sq = wtp->addQueue();
 
-	wtp->startThreads();
+    wtp->startThreads();
 
-	for (i=0; i< 20; i++) {
-		WorkItem *wi = new TestItem(i);
-		wtp->addWorkItem(wi, sq);
-	}
+    for (i=0; i< 20; i++) {
+        WorkItem *wi = new TestItem(i);
+        wtp->addWorkItem(wi, sq);
+    }
 
-	cout << "Waiting for empty\n";
-	wtp->waitEmpty();
-	cout << "WTP empty. Waiting for shutdown.\n";
-	wtp->shutDown();
-	delete wtp;
+    cout << "Waiting for empty\n";
+    wtp->waitEmpty();
+    cout << "WTP empty. Waiting for shutdown.\n";
+    wtp->shutDown();
+    delete wtp;
 
 } catch (CallerError& exc) {
-	cout << "Illegal WTP use: " << exc.getMessage() << endl;
+    cout << "Illegal WTP use: " << exc.getMessage() << endl;
 } catch (InternalError& exc) {
-	cout << "InternalError: " << exc.getMessage() << endl;
-}	
+    cout << "InternalError: " << exc.getMessage() << endl;
+}    
 
 }
