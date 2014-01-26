@@ -23,6 +23,8 @@ void WTP::WorkItem::addSubItem(WorkItem *wi)
         throw CallerError("addSubItem() called from non-running work item");
     if (_subitem)
         throw CallerError("Attempt to add subitem from subitem");
+    if (_qid == 0)
+        throw CallerError("Attempt to add subitem from concurrent queue.");
     
     wi->_subitem = true;
     wi->_parent = this;
