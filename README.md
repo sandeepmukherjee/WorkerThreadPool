@@ -21,8 +21,8 @@
  - Deallocate WorkerThreadPool object.
  - If using freelists, deallocate them.
 
-  The code is extensively documented in Doxygen format, and all efforts are made to keep the comments coherent and in sync with the code. Inaccurate or missing documentation should be reported as bugs.
+  The code is extensively documented in Doxygen format, and all efforts are made to keep the comments coherent and in sync with the code. Inaccurate or missing documentation should be reported as bugs. Run "make doc" to generate Doxygen docs.
 
-Please see the LICENSE file for licensing information.
+Please see LICENSE.txt for licensing information.
 
 */

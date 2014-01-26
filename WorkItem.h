@@ -47,7 +47,7 @@ public:
      * The implementation should not block for very long periods of time.
      */
     virtual void run() = 0;
-    
+
     /**
      * Callers need to define this function if using freelists.
      * This function should clear out all state information, free up any
@@ -61,14 +61,14 @@ public:
     /**
      * @brief User-defined callback, gets invoked when sub-items complete.
      *
-     * This function gets invoked by the threadpool when all submitems
-     * complete. The function is guaranteed to be invoked after all submitems
+     * This function gets invoked by the threadpool when all subitems
+     * complete. The function is guaranteed to be invoked after all subitems
      * complete, but may or may not be invoked before the queue starts moving
-      * again.
+     * again.
      * This means that implementations must not rely on the queue to be 
      * paused when this function is called.
      */
-    virtual void subitemsComplete() {}
+    virtual void subItemsComplete() {}
     /**
      * @brief returns a string representation of this object.
      *
@@ -113,7 +113,7 @@ protected:
      * Subitems cannnot create more subitems.
      * The sequential queue is paused till all subitems and
      * parent WorkItem complete.
-     * The function subitemsComplete() gets invoked by the threadpool when all
+     * The function subItemsComplete() gets invoked by the threadpool when all
      * submitems complete.
      * The function is guaranteed to be invoked after all submitems
      */

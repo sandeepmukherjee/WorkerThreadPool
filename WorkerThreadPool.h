@@ -47,7 +47,7 @@ public:
     /**
      * Remove all waiting WorkItem objects and free them up or return them
      * to their freelists if they are from a freelist.
-     * Neither the Run(), nor subitemsComplete() get called.
+     * Neither the Run(), nor subItemsComplete() get called.
      */
     void drain();
     /**

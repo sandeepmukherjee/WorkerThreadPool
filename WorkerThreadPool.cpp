@@ -171,7 +171,7 @@ void WTP::WorkerThreadPool::completeItem(WorkItem *wi)
 {
     if (wi == NULL)
         return;
-    wi->subitemsComplete(); // This is a caller-defined function
+    wi->subItemsComplete(); // This is a caller-defined function
 
     // cout << "Deallocating workitem " << wi << endl;
     if (wi->fromFreelist()) {

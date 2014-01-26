@@ -4,7 +4,7 @@
 CFLAGS = -g -Wall -Wextra -Werror
 OBJS = WorkerThreadPool.o Freelist.o WorkItem.o SharedObject.o WTPExceptions.o
 
-all : WTP.a tests
+all : WTP.a test
 
 WTP.a: $(OBJS)
 	ar rcv WTP.a $(OBJS)
@@ -22,12 +22,12 @@ WorkItem.o : WorkItem.cpp WorkItem.h
 SharedObject.o : SharedObject.cpp SharedObject.h 
 	g++ $(CFLAGS)  -c SharedObject.cpp
 
-tests : $(OBJS)
-	$(MAKE) -C test
+test : $(OBJS)
+	$(MAKE) -C tests
 
 doc:
 	doxygen Doxyfile
 
 clean:
-	rm -f *.o wtptest
-	$(MAKE) -C test clean
+	rm -rf $(OBJS) WTP.a docs
+	$(MAKE) -C tests clean
