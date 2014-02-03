@@ -5,6 +5,7 @@
 #include "WTPExceptions.h"
 
 #include <string>
+#include <sstream>
 
 using namespace WTP;
 
@@ -30,4 +31,15 @@ void WTP::WorkItem::addSubItem(WorkItem *wi)
     wi->_parent = this;
     incrRefcount();
     _threadPool->_addSubItem(wi, this);
+}
+
+std::string WTP::WorkItem::toString()
+{
+    if (_myname.empty()) {
+        std::ostringstream buf;
+        buf << "WorkItem: " << getName() << " @" << this;
+        _myname = buf.str();
+    }
+
+    return _myname;
 }

@@ -70,11 +70,20 @@ public:
      */
     virtual void subItemsComplete() {}
     /**
-     * @brief returns a string representation of this object.
+     * @brief returns a user-friendly name for this WorkItem.
      *
-     * Caution: The first invocation to this function may be slow.
+     * The implementation must provide a suitable name for each WorkItem
+     * instance. The return value is used for diagnostic and debugging purposes.
+     * Tip: Implementations should cache the value and return the same value
+     * upon subsequent calls.
+     * @return WorkItem name.
      */
-    virtual std::string toString()  {return std::string("TBD");}
+    virtual std::string getName()  {return std::string("Generic");}
+    /**
+     * @brief Returns a text representation of this WorkItem.
+     */
+    std::string toString();
+
     virtual ~WorkItem() {}
 
     /** For internal use only. DO NOT CALL */
@@ -137,6 +146,7 @@ private:
      */
     WorkItem *_parent;
     uint64_t _gen; // Used primarily for debugging. Valid only when in WTP.
+    std::string _myname; /**< String returned by toString */
 
     WorkItem& operator=(const WorkItem& rhs);
     WorkItem(const WorkItem& rhs);

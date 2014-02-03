@@ -29,12 +29,12 @@ class TestItem : public WorkItem {
 public:
     TestItem(int serial) : _serial(serial) {}
  void run() {
-        int tm = int((double(rand())/RAND_MAX) * 5);
-        buf << "Starting " << _serial << ", sleeptime=" << tm;
+        _tm = int((double(rand())/RAND_MAX) * 5);
+        buf << "Starting " << toString() << ", sleeptime=" << _tm;
         string str = buf.str();
         log(str);
         buf.clear(); buf.str("");
-        sleep(tm);
+        sleep(_tm);
         buf << "Done " << _serial;
         log(buf.str());
         // buf.clear(); buf.str("");
@@ -43,9 +43,20 @@ public:
         buf.clear(); buf.str("");
         _serial = -1;    
     }
+
+    std::string getName() {
+        if (_name.empty()) {
+            ostringstream buf2;
+            buf2 << "TestItem, sleep=" << _tm;
+            _name = buf2.str();
+        }
+        return _name;
+    }
 private:
     int _serial;
     ostringstream buf;
+    std::string _name;
+    int _tm;
 };
 
 int main()
