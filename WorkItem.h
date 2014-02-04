@@ -72,15 +72,12 @@ public:
     /**
      * @brief returns a user-friendly name for this WorkItem.
      *
-     * The implementation must provide a suitable name for each WorkItem
-     * instance. The return value is used for diagnostic and debugging purposes.
+     * The implementation must provide a suitable text representation for each
+     * WorkItem instance.
+     * The return value is used for diagnostic and debugging purposes.
      * Tip: Implementations should cache the value and return the same value
      * upon subsequent calls.
      * @return WorkItem name.
-     */
-    virtual std::string getName()  {return std::string("Generic");}
-    /**
-     * @brief Returns a text representation of this WorkItem.
      */
     std::string toString();
 

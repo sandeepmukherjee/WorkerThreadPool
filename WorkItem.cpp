@@ -37,7 +37,7 @@ std::string WTP::WorkItem::toString()
 {
     if (_myname.empty()) {
         std::ostringstream buf;
-        buf << "WorkItem: " << getName() << " @" << this;
+        buf << "WorkItem @" << this;
         _myname = buf.str();
     }
 
