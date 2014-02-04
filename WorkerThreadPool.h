@@ -162,8 +162,13 @@ public:
     /**
      * @brief Waits for all WorkItems (queued as well as executing) to complete.
      *
+     * This function blocks till all WorkItems in the WTP have completed and
+     * have been deallocated or returned to their respective freelists.
      * Do not call from within a WorkItem.
-     * Caution: This function may block for a long time.
+     * If a thread calling this function is waiting while callers add
+     * more WorkItems to the WTP from a different thread, there might be a 
+     * race condition where this call returns but the WTP is not empty.
+     * To prevent this, do not add more WorkItems after making this call.
      */
     void waitEmpty();
 

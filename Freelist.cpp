@@ -42,6 +42,7 @@ void WTP::Freelist::drain()
     while (!_wilist.empty()) {
         WorkItem *wi = _wilist.back();
         _wilist.pop_back();
+        wi->setState(WorkItem::INVALID);
         delete wi;
     }
     unlock();

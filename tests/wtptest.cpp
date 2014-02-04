@@ -44,14 +44,6 @@ public:
         _serial = -1;    
     }
 
-    std::string getName() {
-        if (_name.empty()) {
-            ostringstream buf2;
-            buf2 << "TestItem, sleep=" << _tm;
-            _name = buf2.str();
-        }
-        return _name;
-    }
 private:
     int _serial;
     ostringstream buf;

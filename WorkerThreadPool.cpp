@@ -88,6 +88,7 @@ void WTP::WorkerThreadPool::shutDown()
 
 void WTP::WorkerThreadPool::_threadStart()
 {
+    uint32_t total_items = 0;
     while (1) {
         lock();  /////////////// Begin critical region /////////////////
         if(_shuttingDown == true) {
@@ -141,7 +142,7 @@ void WTP::WorkerThreadPool::_threadStart()
             int prefcount = parent->decrRefcount();
             unsigned int pqid = parent->getQID();
             WTPqueue& parentQueue = getQueue(pqid);
-            parentQueue.deliverEvent(WTPqueue::SI_END); // TODO. Do this in completeItem()
+            parentQueue.deliverEvent(WTPqueue::SI_END);
             if (prefcount == 0) {
                 decrTotalItems();
                 parentQueue.deliverEvent(WTPqueue::ALL_DONE);
@@ -153,17 +154,18 @@ void WTP::WorkerThreadPool::_threadStart()
         if (refcount > 0)
             wi = NULL; // Don't deallocate a WI with subitems.
 
+        total_items = _totalItems;
         pthread_cond_signal(&_cond);
         unlock(); /////////////// End critical region /////////////////
 
         completeItem(wi); // Note, wi may be NULL. This is OK.
         completeItem(parent);
 
-        lock();
-        if (_totalItems == 0) {
+        if (total_items == 0) {
+            lock();
             pthread_cond_signal(&_empty_cond);
+            unlock();
         }
-        unlock();
     }
 }
 
