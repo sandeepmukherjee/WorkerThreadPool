@@ -318,6 +318,33 @@ void WorkerThreadPool::unlock()
 		   throw InternalError("Failed to unlock mutex", __FILE__, __LINE__);
 }
 
+uint32_t WorkerThreadPool::getTotalItems()
+{
+    uint32_t ret = 0;
+    lock();
+    ret = _totalItems;
+    unlock();
+    return ret;
+}
+
+uint32_t WorkerThreadPool::getTotalProcessing()
+{
+    uint32_t ret = 0;
+    lock();
+    ret = _nprocessing;
+    unlock();
+    return ret;
+}
+
+uint32_t WorkerThreadPool::getTotalQueued()
+{
+    uint32_t ret = 0;
+    lock();
+    ret = _nqueued;
+    unlock();
+    return ret;
+}
+
 void WTPqueue::drain()
 {
     while(!this->empty()) {

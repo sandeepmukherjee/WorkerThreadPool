@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
+#include <assert.h>
 
 using namespace std;
 WorkerThreadPool *wtp = NULL;
@@ -84,6 +85,15 @@ try {
             throw string("Freelist empty");
         wtp->addWorkItem(wi);
         sleep(1); // Gives a chance for concurrent queue to empty out.
+        ostringstream buf;
+        uint32_t proc = wtp->getTotalProcessing();
+        uint32_t queued = wtp->getTotalQueued();
+        uint32_t total = wtp->getTotalItems();
+        buf << "Total queued = " << queued <<
+        ", total processing = " << proc <<
+        ", total Items = " << total;
+        log(buf.str());
+        assert(total == proc+queued);
     }
 
     cout << "Waiting for empty\n";

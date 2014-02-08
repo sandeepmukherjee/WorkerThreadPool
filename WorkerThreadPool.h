@@ -152,7 +152,9 @@ public:
      */
     unsigned int addQueue();
     /**
-     * Shut down the WorkerThreadPool object. Executing work items are allowed
+     * @brief Shuts down the WorkerThreadPool object.
+     *
+     * Executing work items are allowed
      * to proceed to completion. All queued work items are freed or returned
      * back to their respective freelists.
      * Because this function waits for all running WorkItems to complete, it
@@ -176,9 +178,31 @@ public:
     void _addSubItem(WorkItem *item, WorkItem *parent);
     /** For internal use unly. DO NOT CALL */
     WTPqueue& getQueue(unsigned int qid);
-    /** For internal use unly. DO NOT CALL */
-    bool isEmpty(); /**< Returns true if WTP is empty, false otherwise */
+    /**
+     * @brief Check if the WTP is empty.
+     * 
+     * Note, if there are other threads adding
+     * workitems, it's possible for this function to return true even though
+     * the WTP is not empty.
+     * @return  true if WTP is empty, false otherwise.
+     */
+    bool isEmpty();
     void _threadStart(); /**< For internal use only. */
+    /**
+     * @brief Retrieves the total number of work items in the pool 
+     * @return Total work items in the pool.
+     */
+    uint32_t getTotalItems();
+    /**
+     * @brief Retrieves the total number of work items currently being processed
+     * @return Total work items being processed.
+     */
+    uint32_t getTotalProcessing();
+    /**
+     * @brief Retrieves the total number of work items currently queued.
+     * @return Total work items that are queued.
+     */
+    uint32_t getTotalQueued();
 private:
     int _nthreads; /**< Number of threads in the threadpool */
     unsigned int _nqueued; /**< Number of WorkItem queued and waiting to be executed */
