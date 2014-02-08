@@ -230,6 +230,10 @@ private:
     void lock();
     void unlock();
     
+    /* No Copying or assigning */
+    WorkerThreadPool operator=(const WorkerThreadPool& rhs) const;
+    WorkerThreadPool(const WorkerThreadPool& rhs);
+
 };
 
 }

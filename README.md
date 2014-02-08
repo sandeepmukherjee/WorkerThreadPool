@@ -1,5 +1,6 @@
 /**
  @mainpage
+
   The WorkerThreadPool (WTP) is a library that allows implementors to define Work Items that get run concurrently by a fixed set of threads.
 
   Current status: Experimental
@@ -22,6 +23,8 @@
  - If using freelists, deallocate them.
 
   The code is extensively documented in Doxygen format, and all efforts are made to keep the comments coherent and in sync with the code. Inaccurate or missing documentation should be reported as bugs. Run "make doc" to generate Doxygen docs.
+
+This library is well-suited for applications that can divide the total work into smaller, well-defined independent chunks. It may not be appropriate for applications that require a lot of thread interaction or deal with a lot of shared data. In particular, it is illegal for WorkItems to reference other WorkItems in running state.
 
 Please see LICENSE.txt for licensing information.
 

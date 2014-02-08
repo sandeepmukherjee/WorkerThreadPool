@@ -121,7 +121,7 @@ void WTP::WorkerThreadPool::_threadStart()
         wi->setThreadPool(this);
         wi->setQID(qid);
 
-        wi->run();
+        wi->run(); // Need to catch Exceptions. TBD.
 
         wi->setThreadPool(NULL);
         wi->setState(WorkItem::IDLE);
@@ -266,8 +266,8 @@ void WTP::WorkerThreadPool::addWorkItem(WorkItem *item, unsigned int qid)
     _nqueued++;
     incrTotalItems();
 
-    unlock();
     pthread_cond_signal(&_cond);
+    unlock();
 }
 
 void WTP::WorkerThreadPool::incrTotalItems()
@@ -306,9 +306,9 @@ bool WTP::WorkerThreadPool::_threadIsInternal()
 
 void WorkerThreadPool::lock()
 {
-       int rc = pthread_mutex_lock(&_mutex);
-       if (rc != 0)
-		   throw InternalError("Failed to lock mutex", __FILE__, __LINE__);
+   int rc = pthread_mutex_lock(&_mutex);
+   if (rc != 0)
+       throw InternalError("Failed to lock mutex", __FILE__, __LINE__);
 }
 
 void WorkerThreadPool::unlock()
