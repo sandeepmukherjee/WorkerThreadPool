@@ -1,4 +1,8 @@
 
+/**
+ * THIS IS WORK IN PROGRESS!
+ */
+
 #include "Freelist.h"
 #include "WTPExceptions.h"
 #include "WorkerThreadPool.h"
@@ -22,6 +26,8 @@ Freelist freelist;
 class DirProcessor : public WorkItem {
 public:
     static void procdir(int dirfd, int level, int nsubdirs, int nfiles, uint64_t filesize);
+    static void randfile(int fd, uint64_t size);
+
     void setParams(int dirfd, int level, int nsubdirs, int nfiles,
                  uint64_t filesize) {
        _dirfd = dirfd;
@@ -47,6 +53,24 @@ private:
     uint64_t _filesize;
 };
 
+void DirProcessor::randfile(int fd, uint64_t size)
+{
+    uint64_t remaining = size;
+    char *buf = new char[4000];
+    while (remaining > 0) {
+        int toread = remaining > 4000 ? 4000 : remaining;
+        int in = read(rndfd, buf, toread);
+        if (in < 0)
+            throw string("Failed to read /dev/urandom");
+        int wrote = write(fd, buf, in);
+        if (wrote < 0)
+            throw string("Failed to write to file");
+        remaining -= wrote;
+    }
+
+    delete[] buf;
+}
+
 void DirProcessor::procdir(int dirfd, int level, int nsubdirs, int nfiles, uint64_t filesize)
 {
     int fd = 0;
@@ -59,13 +83,14 @@ void DirProcessor::procdir(int dirfd, int level, int nsubdirs, int nfiles, uint6
     if (level > 0) {
        for (i=0; i< nsubdirs; i++) {
             ost << "dir" << i; 
-            const char *dirname = ost.str().c_str();
-            rc = mkdirat(dirfd, dirname, 0777); 
+            const string& dirname = ost.str();
+            const char *dirname_c = dirname.c_str();
+            rc = mkdirat(dirfd, dirname_c, 0777); 
             if (rc < 0) {
                 perror("mkdirat");
                 throw string("mkdirat() failed");
             }
-            fd = openat(dirfd, dirname, O_RDONLY);
+            fd = openat(dirfd, dirname_c, O_RDONLY);
             if (fd < 0) {
                 perror("openat");
                 throw string("openat() failed for subdir");
@@ -86,31 +111,30 @@ void DirProcessor::procdir(int dirfd, int level, int nsubdirs, int nfiles, uint6
        }
     }
 
-    char *buf = new char[filesize];
 
     for (i=0; i<nfiles; i++) {
         ost << "file" << i;
-        const char * filename  = ost.str().c_str();
-        int fd = openat(dirfd, filename,
+        const string& filename = ost.str();
+        int fd = openat(dirfd, filename.c_str(),
                         O_CREAT | O_WRONLY | O_TRUNC, 0666);
         if (fd < 0) 
             throw string("openat() failed");
-        if (read(rndfd, buf, filesize) != filesize)
-            throw string("Failed to read from /dev/urandom");
-        if (write(fd, buf, filesize) != filesize)
-            throw string("Failed to write to file");
+        randfile(fd, filesize);
         close(fd);
-        // cout << "YAAAA" << endl;
         ost.clear(); ost.str("");
     }
 
-    delete[] buf;
     close(dirfd);
 
 }
 
 int main(int argc, char *argv[])
 {
+    const int ndirs = 4;
+    const int nfiles = 6;
+    const int height = 6;
+    const int filesize = 8000;
+
 try {
     if (argc < 2)
         throw CallerError("usage: treebuild topdir [options ..]");
@@ -119,9 +143,13 @@ try {
         perror("/dev/urandom");
         throw string("Failed to open /dev/urandom");
     }
-    int dirfd = open(argv[1], O_RDONLY);
+    const char *topdir = argv[1];
+    int rc = mkdir(topdir, 0777);
+    if (rc < 0)
+        throw string("Failed to create top level dir");
+    int dirfd = open(topdir, O_RDONLY);
     if (dirfd < 0)
-        throw string("Failed to open topdir.");
+        throw string("Failed to open top level dir.");
 
     int i=0;
     for (i=0; i< 1000; i++) {
@@ -129,12 +157,11 @@ try {
         freelist.addItem(dp);
     }
 
-    wtp = new WorkerThreadPool();
+    wtp = new WorkerThreadPool(16);
+    wtp->startThreads();
 
     DirProcessor *dp = new DirProcessor();
-    dp->setParams(dirfd, 5, 4, 5, 1000);
-    
-    wtp->startThreads();
+    dp->setParams(dirfd, height, ndirs, nfiles, filesize);
 
     wtp->addWorkItem(dp);
 
@@ -149,6 +176,8 @@ try {
 
 } catch (CallerError& exc) {
     cout << "Illegal use of WTP library: " << exc.getMessage() << endl;
-}    
+} catch(std::string& err) {
+    cout << err << endl;
+}
 
 }
