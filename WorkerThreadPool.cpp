@@ -91,21 +91,16 @@ void WTP::WorkerThreadPool::_threadStart()
     uint32_t total_items = 0;
     while (1) {
         lock();  /////////////// Begin critical region /////////////////
+
+        unsigned int qid = 0;
+        WTPqueue* pqueue = NULL;
+        while ((pqueue = _getNextQueue(qid)) == NULL && !_shuttingDown) {
+            pthread_cond_wait(&_cond, &_mutex);
+        }
+
         if(_shuttingDown == true) {
             unlock();
             return;
-        }
-
-        unsigned int qid;
-        WTPqueue* pqueue = _getNextQueue(qid);
-        if (pqueue == NULL) {
-            pthread_cond_wait(&_cond, &_mutex);
-            if(_shuttingDown == true) {
-                unlock();
-                return;
-            }
-            unlock();
-            continue;
         }
 
         WorkItem *wi = pqueue->front(); pqueue->pop();
