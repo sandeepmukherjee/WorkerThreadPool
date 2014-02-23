@@ -15,6 +15,9 @@
 #include <cstdlib>
 #include <sstream>
 #include <assert.h>
+#include <unistd.h>
+#include <getopt.h>
+#include <map>
 
 using namespace std;
 using namespace WTP;
@@ -128,22 +131,77 @@ void DirProcessor::procdir(int dirfd, int level, int nsubdirs, int nfiles, uint6
 
 }
 
+int usage_exit(const string& progname, const string& err)
+{
+    cerr << "Error: " << string(err) << endl;
+    cerr << "Usage: " << progname << 
+            " --height=height --nfiles=files-perdir --height=tree-height" <<
+            " topdir" << endl;
+
+    exit(-1);
+
+}
+
+static std::map<string, int *> valmap;
+void setGlobalVal(const string& progname, const string& optname, const string& optvalstr)
+{
+    std::map<string, int *>::iterator iter = valmap.find(optname);
+    assert (iter != valmap.end());
+    int *valptr = valmap[optname];
+    *valptr = atoi(optvalstr.c_str());
+    if (*valptr <= 0)
+        usage_exit(progname, string("Option argument must be positive integer"));
+}
+
 int main(int argc, char *argv[])
 {
-    const int ndirs = 4;
-    const int nfiles = 6;
-    const int height = 6;
-    const int filesize = 8000;
+
+    int ndirs = 4;
+    int nfiles = 6;
+    int height = 6;
+    int filesize = 8000;
+    const string progname(argv[0]);
+
+    valmap[string("ndirs")] = &ndirs;
+    valmap[string("nfiles")] = &nfiles;
+    valmap[string("height")] = &height;
+    valmap[string("filesize")] = &filesize;
+
+    int option_index = 0;
+    const char *topdir = NULL;
+    struct option longopts[] = {
+    {"ndirs", required_argument,  0, 0},
+    {"nfiles", required_argument,  0, 0},
+    {"height", required_argument,  0, 0},
+    {"filesize", required_argument,  0, 0},
+    {0, 0, 0, 0}
+    };
+
+    while (1) {
+        int c = getopt_long(argc, argv, "", longopts, &option_index);
+        if (c == -1)
+            break;
+        if (c  != 0)
+            usage_exit(progname, string("Command line parse error"));
+        string optname(longopts[option_index].name);
+        string optvalstr(optarg);
+
+        setGlobalVal(progname, optname, optvalstr);
+
+    }
+
+   if (optind == (argc-1)) {
+       topdir = argv[optind];
+   } else {
+        usage_exit(progname, string("Insufficient arguments"));
+   }
 
 try {
-    if (argc < 2)
-        throw CallerError("usage: treebuild topdir [options ..]");
     rndfd = open("/dev/urandom", O_RDONLY);
     if (rndfd < 0) {
         perror("/dev/urandom");
         throw string("Failed to open /dev/urandom");
     }
-    const char *topdir = argv[1];
     int rc = mkdir(topdir, 0777);
     if (rc < 0)
         throw string("Failed to create top level dir");
@@ -174,6 +232,8 @@ try {
     if (globerr < 0)
         cout << "Failure" << endl;
 
+} catch (InternalError& exc) {
+    cout << "WTP internal bug or system is in unstable state: " << exc.getMessage() << endl;
 } catch (CallerError& exc) {
     cout << "Illegal use of WTP library: " << exc.getMessage() << endl;
 } catch(std::string& err) {
