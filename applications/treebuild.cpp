@@ -134,9 +134,12 @@ void DirProcessor::procdir(int dirfd, int level, int nsubdirs, int nfiles, uint6
 int usage_exit(const string& progname, const string& err)
 {
     cerr << "Error: " << string(err) << endl;
-    cerr << "Usage: " << progname << 
-            " --height=height --nfiles=files-perdir --height=tree-height" <<
-            " topdir" << endl;
+    cerr << "Usage: " << progname << " [options..] topdir" << endl <<
+            "options: " << endl <<
+            "    --height=height (level of directory structure)" << endl <<
+            "    --nfiles=numfiles (Number of files per directory)" << endl <<
+            "    --ndirs=ndirs (Number of subdirectories per directory)" << endl <<
+            "    --filesize=filesize (Size of each file in bytes)" << endl;
 
     exit(-1);
 
