@@ -25,11 +25,14 @@ WorkerThreadPool *wtp = NULL;
 int globerr = 0;
 int rndfd = 0;
 Freelist freelist;
+int cpulite = 0;
+char *litebuf = NULL;
 
 class DirProcessor : public WorkItem {
 public:
     static void procdir(int dirfd, int level, int nsubdirs, int nfiles, uint64_t filesize);
     static void randfile(int fd, uint64_t size);
+    static void randfile_lite(int fd, uint64_t size);
 
     void setParams(int dirfd, int level, int nsubdirs, int nfiles,
                  uint64_t filesize) {
@@ -56,6 +59,18 @@ private:
     uint64_t _filesize;
 };
 
+void DirProcessor::randfile_lite(int fd, uint64_t size)
+{
+    uint64_t remaining = size;
+    while (remaining > 0) {
+        int towrite = remaining > 4000 ? 4000 : remaining;
+        int wrote = write(fd, litebuf, towrite);
+        if (wrote < 0)
+            throw string("Failed to write to file");
+        remaining -= wrote;
+    }
+
+}
 void DirProcessor::randfile(int fd, uint64_t size)
 {
     uint64_t remaining = size;
@@ -122,7 +137,10 @@ void DirProcessor::procdir(int dirfd, int level, int nsubdirs, int nfiles, uint6
                         O_CREAT | O_WRONLY | O_TRUNC, 0666);
         if (fd < 0) 
             throw string("openat() failed");
-        randfile(fd, filesize);
+        if (cpulite)
+            randfile_lite(fd, filesize);
+        else
+            randfile(fd, filesize);
         close(fd);
         ost.clear(); ost.str("");
     }
@@ -166,6 +184,7 @@ int main(int argc, char *argv[])
     valmap[string("nfiles")] = &nfiles;
     valmap[string("height")] = &height;
     valmap[string("filesize")] = &filesize;
+    valmap[string("cpulite")] = &cpulite;
 
     int option_index = 0;
     const char *topdir = NULL;
@@ -174,6 +193,7 @@ int main(int argc, char *argv[])
     {"nfiles", required_argument,  0, 0},
     {"height", required_argument,  0, 0},
     {"filesize", required_argument,  0, 0},
+    {"cpulite", optional_argument,  0, 0},
     {0, 0, 0, 0}
     };
 
@@ -202,6 +222,11 @@ try {
         perror("/dev/urandom");
         throw string("Failed to open /dev/urandom");
     }
+    if (cpulite) {
+	    litebuf = new char[4000];
+        read(rndfd, litebuf, 4000);
+        close(rndfd);
+	}
     int rc = mkdir(topdir, 0777);
     if (rc < 0)
         throw string("Failed to create top level dir");
@@ -228,6 +253,8 @@ try {
     cout << "WTP empty. Waiting for shutdown.\n";
     wtp->shutDown();
     delete wtp;
+    if (cpulite)
+        delete[] litebuf;
 
     if (globerr < 0)
         cout << "Failure" << endl;
