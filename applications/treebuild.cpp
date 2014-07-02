@@ -23,7 +23,7 @@ using namespace std;
 using namespace WTP;
 WorkerThreadPool *wtp = NULL;
 int globerr = 0;
-int rndfd = 0;
+int rndfd = 0; // Filehandle to /dev/urandom. Not set if cpulite is in effect
 Freelist freelist;
 int cpulite = 0;
 char *litebuf = NULL;
@@ -153,8 +153,9 @@ int usage_exit(const string& progname, const string& err)
 {
     cerr << "Error: " << string(err) << endl;
     cerr << "Usage: " << progname << 
-            " --height=height --nfiles=files-perdir --height=tree-height" <<
-            " topdir" << endl;
+           " --height=height --nfiles=files-perdir --height=tree-height" <<
+           " --ndirs=subdirs-per-dir --filesize=file-size [--cpulite] topdir" << 
+            endl;
 
     exit(-1);
 
@@ -193,7 +194,7 @@ int main(int argc, char *argv[])
     {"nfiles", required_argument,  0, 0},
     {"height", required_argument,  0, 0},
     {"filesize", required_argument,  0, 0},
-    {"cpulite", optional_argument,  0, 0},
+    {"cpulite", no_argument,  NULL, 1},
     {0, 0, 0, 0}
     };
 
@@ -201,20 +202,21 @@ int main(int argc, char *argv[])
         int c = getopt_long(argc, argv, "", longopts, &option_index);
         if (c == -1)
             break;
-        if (c  != 0)
-            usage_exit(progname, string("Command line parse error"));
+
         string optname(longopts[option_index].name);
-        string optvalstr(optarg);
-
-        setGlobalVal(progname, optname, optvalstr);
-
+        if (c == 0) {
+            string optvalstr(optarg);
+            setGlobalVal(progname, optname, optvalstr);
+        } else {
+            setGlobalVal(progname, optname, string("1"));
+        }
     }
 
-   if (optind == (argc-1)) {
+    if (optind == (argc-1)) {
        topdir = argv[optind];
-   } else {
+    } else {
         usage_exit(progname, string("Insufficient arguments"));
-   }
+    }
 
 try {
     rndfd = open("/dev/urandom", O_RDONLY);
