@@ -40,13 +40,15 @@ private:
     int _sleeptime;
 };
 
+/**
+ * Add same WI twice.
+ */
 void test1()
 {
     int sleeptime = 5;
     starttime = time(NULL);
     wtp = new WorkerThreadPool();
     unsigned int sq = wtp->addQueue();
-
     wtp->startThreads();
 
 	Sleeper *wi = new Sleeper(sleeptime);
@@ -70,10 +72,65 @@ void test1()
 
 }
 
+class SharedFlag : public SharedObject {
+public:
+    bool getStatus() { return _status;}
+    void setStatus(bool status) { _status = status;}
+    SharedFlag() : _status(false) {}
+private:
+    bool _status;
+};
+
+/**
+ * Does something illegal.
+ */
+class Rogue : public WorkItem {
+public:
+    Rogue(WorkerThreadPool *wtp, SharedFlag& sf) : _wtp(wtp), _sf(sf) {}
+	void run() {
+        try {
+            _wtp->waitEmpty();
+            _sf.setStatus(false);
+        } catch (CallerError& err) {
+            cout << "WTP threw CallerError(expected): " << 
+                    err.getMessage() << endl;
+                    _sf.setStatus(true);
+        }
+    }
+    void reset() {
+        _wtp = NULL;
+    }
+private:
+    WorkerThreadPool *_wtp;
+    SharedFlag& _sf;
+};
+
+void test2()
+{
+    WorkerThreadPool *wtp = new WorkerThreadPool();
+    wtp->startThreads();
+    SharedFlag so;
+    Rogue *wi = new Rogue(wtp, so);
+	wtp->addWorkItem(wi);
+    cout << "Waiting for empty\n";
+    wtp->waitEmpty();
+    cout << "WTP empty. Waiting for shutdown.\n";
+    wtp->shutDown();
+    delete wtp;
+
+    bool status = so.getStatus();
+    if (!status)
+        throw string("Expected exception was not thrown.");
+
+
+}
+
+
 int main()
 {
 try {
     test1();
+    test2();
 } catch (CallerError& exc) {
     cout << "Unexpected test error (this may be a bug in test program): " << exc.getMessage() << endl;
 } catch (InternalError& exc) {
