@@ -125,12 +125,28 @@ void test2()
 
 }
 
+/**
+ * Test for illegal queue check.
+ */
+void test3()
+{
+    WorkerThreadPool *wtp = new WorkerThreadPool();
+    wtp->startThreads();
+    Sleeper *wi = new Sleeper(1); // Any WI will work. It will never run.
+    try {
+        wtp->addWorkItem(wi, 1);
+    } catch (CallerError& ex) {
+        cout << "WTP generated caller error (expected): " <<
+                ex.getMessage() << std::endl;
+    }
+}
 
 int main()
 {
 try {
     test1();
     test2();
+    test3();
 } catch (CallerError& exc) {
     cout << "Unexpected test error (this may be a bug in test program): " << exc.getMessage() << endl;
 } catch (InternalError& exc) {
