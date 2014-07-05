@@ -3,7 +3,7 @@
 
   The WorkerThreadPool (WTP) is a library that allows implementors to define Work Items that get run concurrently by a fixed set of threads.
 
-  Current status: Experimental
+  Current status: Version 1.0
 
   Callers add WTP::WorkItem objects to queues which are maintained internally by the WTP. When a worker thread is free, it looks in its list of queues, selects one, removes the next WorkItem from the queue, and invokes WorkItem's run() method. Every WorkerThreadPool comes with exactly one "concurrent" queue. WorkItem objects added to this queue may execute concurrently. Callers can create additional queues, but all additional queues are "sequential", meaning the next WorkItem does not get executed till the current one has completed.
 
