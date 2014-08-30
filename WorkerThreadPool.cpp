@@ -111,7 +111,7 @@ void WTP::WorkerThreadPool::_threadStart()
         unlock(); /////////////// End critical region /////////////////
 
         if (wi->getState() != WorkItem::QUEUED)
-            throw CallerError("Workitem not in queued state"); // Caller added an illegal WorkItem
+            throw InternalError("Workitem not in QUEUED state", __FILE__, __LINE__);
         wi->setState(WorkItem::RUNNING);
         wi->setThreadPool(this);
         wi->setQID(qid);
