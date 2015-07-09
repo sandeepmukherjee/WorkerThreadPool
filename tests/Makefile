@@ -22,4 +22,4 @@ Logger.o : Logger.cpp Logger.h
 	g++ $(CFLAGS)  -c Logger.cpp
 
 clean:
-	rm -f *.o wtptest sitest serialtest
+	rm -f *.o wtptest sitest serialtest errtest
