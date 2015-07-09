@@ -173,7 +173,6 @@ void WTP::WorkerThreadPool::completeItem(WorkItem *wi)
     // cout << "Deallocating workitem " << wi << endl;
     if (wi->fromFreelist()) {
         wi->reset();
-        wi->setState(WorkItem::FREELIST);
         wi->returnToFreelist();
     } else {
         wi->setState(WorkItem::INVALID);
