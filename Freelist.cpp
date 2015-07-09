@@ -13,6 +13,7 @@ void WTP::Freelist::addItem(WorkItem *wi)
         throw CallerError("WorkItem being added to freelist is not "
                             "in IDLE state");
     wi->setState(WorkItem::FREELIST);
+    wi->setFreelist(this);
     lock();
     _wilist.push_back(wi);
     unlock();
