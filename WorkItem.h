@@ -94,6 +94,8 @@ public:
      */
     bool fromFreelist() { return (_freelist != NULL); }
     /** For internal use only. DO NOT CALL */
+    void setFreelist(Freelist *freelist) { this->_freelist = freelist; }
+    /** For internal use only. DO NOT CALL */
     bool isSubItem() { return _subitem; }
     /** For internal use only. DO NOT CALL */
     void setThreadPool(WorkerThreadPool *wtp) {_threadPool = wtp;}

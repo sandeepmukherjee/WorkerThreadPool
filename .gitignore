@@ -2,3 +2,5 @@
 WTP.a
 *.o
 docs
+applications/treebuild
+tests/errtest

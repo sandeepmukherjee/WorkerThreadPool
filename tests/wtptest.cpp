@@ -42,7 +42,6 @@ public:
     }
     void reset() {
         buf.clear(); buf.str("");
-        _serial = -1;    
     }
 
 private:

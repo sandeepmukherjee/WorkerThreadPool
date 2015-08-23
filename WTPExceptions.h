@@ -55,7 +55,7 @@ public:
      * Default constructor.
      * @param[in] errmsg String representing this error.
      */
-    CallerError(const std::string& errmsg) : msg(errmsg) {}
+    CallerError(const std::string& errmsg);
 private:
     std::string msg;
 };
