@@ -178,8 +178,8 @@ int main(int argc, char *argv[])
 {
 
     int ndirs = 4;
-    int nfiles = 6;
-    int height = 6;
+    int nfiles = 2;
+    int height = 3;
     int filesize = 8000;
     const string progname(argv[0]);
 
@@ -252,9 +252,9 @@ try {
 
     wtp->addWorkItem(dp);
 
-    cout << "Waiting for empty\n";
+    // cout << "Waiting for empty\n";
     wtp->waitEmpty();
-    cout << "WTP empty. Waiting for shutdown.\n";
+    // cout << "WTP empty. Waiting for shutdown.\n";
     wtp->shutDown();
     delete wtp;
     if (cpulite)

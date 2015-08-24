@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <assert.h>
+#include <unistd.h>
 
 using namespace std;
 WorkerThreadPool *wtp = NULL;

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <unistd.h>
 #include "Freelist.h"
 #include "Logger.h"
 #include "WTPExceptions.h"
